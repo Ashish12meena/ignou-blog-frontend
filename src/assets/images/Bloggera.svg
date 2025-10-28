@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="200" height="60" viewBox="0 0 200 60" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Background Rectangle (Optional) -->
+    <rect width="200" height="60" fill="white"/>
+    
+    <!-- Bloggera Text -->
+    <text x="10" y="40" font-family="Arial, sans-serif" font-size="36" font-weight="bold" fill="#FF6600">
+        Bloggera
+    </text>
+    
+    <!-- Icon: Speech Bubble with Pen -->
+    <g transform="translate(160, 15)">
+        <path d="M10 0C4.477 0 0 3.582 0 8v15c0 4.418 4.477 8 10 8h5l5 6v-6h5c5.523 0 10-3.582 10-8V8c0-4.418-4.477-8-10-8H10z" fill="#FF6600"/>
+        <path d="M12 10h16v2H12zm0 6h12v2H12z" fill="white"/>
+    </g>
+</svg>
