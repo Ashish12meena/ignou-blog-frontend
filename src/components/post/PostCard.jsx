@@ -1,11 +1,22 @@
-import React, { useState } from 'react';
+import React from 'react';
 import IconStrip from '../IconStrip';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import truncate from "html-truncate";
 
-const PostCard = ({ username, userEmail, profilePicture, postTitle, postContent, postImage, likeStatus, likeCount, commentCount, isFullPost, postId }) => {
+const PostCard = ({ 
+  username, 
+  userEmail, 
+  profilePicture, 
+  postTitle, 
+  postContent, 
+  postImage, 
+  likeStatus, 
+  likeCount, 
+  commentCount, 
+  isFullPost, 
+  postId 
+}) => {
   const navigate = useNavigate();
-
 
   const handleReadMore = () => {
     navigate(`/post?postId=${encodeURIComponent(postId)}`, { state: { postId } });
@@ -14,19 +25,16 @@ const PostCard = ({ username, userEmail, profilePicture, postTitle, postContent,
   return (
     <div className="w-full m-3 overflow-x-hidden rounded-lg shadow-md border border-gray-100 bg-white mx-4 md:mx-8 p-4 flex flex-col justify-between h-full">
       <div className={`flex flex-col flex-1 ${!isFullPost ? "md:flex-row" : ""} gap-4`}>
-
-        {/* Content Section */}
-        <div className="flex flex-col flex-1" >
-          {/* User Info */}
+        <div className="flex flex-col flex-1">
           {(profilePicture || username) && (
             <div className="flex items-center gap-2 mb-2">
               <img
-                src={profilePicture || "https://media.istockphoto.com/id/1222357475/vector/image-preview-icon-picture-placeholder-for-website-or-ui-ux-design-vector-illustration.jpg?s=612x612&w=0&k=20&c=KuCo-dRBYV7nz2gbk4J9w1WtTAgpTdznHu55W9FjimE="}
+                src={profilePicture || "https://via.placeholder.com/150"}
                 alt={username || "Unknown"}
                 className="w-10 h-10 rounded-full object-cover"
               />
               <span className="font-semibold text-gray-800">
-                <Link to={`/profile/${userEmail}`} className=" hover:underline">
+                <Link to={`/profile/${userEmail}`} className="hover:underline">
                   {username || "Unknown"}
                 </Link>
               </span>
@@ -48,7 +56,7 @@ const PostCard = ({ username, userEmail, profilePicture, postTitle, postContent,
               </div>
             )}
 
-            <div className="text-sm text-gray-600" onClick={handleReadMore}>
+            <div className="text-sm text-gray-600">
               {isFullPost ? (
                 <span className="break-words whitespace-pre-wrap"
                   dangerouslySetInnerHTML={{ __html: postContent || "No content available." }}>
@@ -78,9 +86,13 @@ const PostCard = ({ username, userEmail, profilePicture, postTitle, postContent,
         )}
       </div>
 
-      {/* IconStrip should always be at the bottom */}
-      <div className="mt-auto pt-4" onClick={handleReadMore}>
-        <IconStrip likeStatus={likeStatus} likeCount={likeCount} commentCount={commentCount} postId={postId} />
+      <div className="mt-auto pt-4">
+        <IconStrip 
+          likeStatus={likeStatus} 
+          likeCount={likeCount} 
+          commentCount={commentCount} 
+          postId={postId} 
+        />
       </div>
     </div>
   );

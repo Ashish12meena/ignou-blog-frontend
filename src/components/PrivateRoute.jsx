@@ -6,7 +6,6 @@ const PrivateRoute = ({ element }) => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Check auth by userId from localStorage
     const userId = localStorage.getItem("userId");
     setIsAuthenticated(!!userId);
   }, []);
@@ -18,7 +17,7 @@ const PrivateRoute = ({ element }) => {
   }, [isAuthenticated, navigate]);
 
   if (isAuthenticated === null) {
-    return <div></div>; // or a loader
+    return <div></div>;
   }
 
   return isAuthenticated ? element : null;

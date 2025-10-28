@@ -1,77 +1,71 @@
 import axios from 'axios';
 import { getCurrentUser } from './authService';
 
-// Base URL for the API
-const BASE = import.meta.env.VITE_API_URL;
+const BASE = import.meta.env.VITE_API_URL || 'http://localhost:8080';
 const BASE_URL = `${BASE}/api/posts`;
 
 const getToken = () => {
-    const user = getCurrentUser(); 
-    return user ? user : null; 
+  const user = getCurrentUser();
+  return user ? user.userId : null;
 };
 
-// Function to fetch card details with Bearer token
-export const  getCardDetails = async ({userId, excludedIds = []}) => {
+export const getCardDetails = async ({ userId, excludedIds = [] }) => {
+  const authToken = getToken();
 
-    const authToken = getToken();
-    
-    
-    if (!authToken) {
-        return false;
-    }
+  if (!authToken) {
+    return false;
+  }
+
   try {
     const response = await axios.post(
       `${BASE_URL}/cardDetails`,
-      {userId,excludedIds},
+      { userId, excludedIds },
       {
         headers: {
-          Authorization: `Bearer ${authToken}`, // Add the Bearer token in the Authorization header
+          Authorization: `Bearer ${authToken}`,
         },
       }
     );
 
-    
-    
-    return response.data; // Return the data part of the response
+    return response.data;
   } catch (error) {
     console.error('Error fetching card details:', error);
-    throw error; // Re-throw the error for further handling
+    throw error;
   }
 };
-export const  getFullPostDetail = async ({postId,userId}) => {
 
-    const authToken = getToken();
-    if (!authToken) {
-        return false;
-    }
-    
-    
+export const getFullPostDetail = async ({ postId, userId }) => {
+  const authToken = getToken();
+  
+  if (!authToken) {
+    return false;
+  }
+
   try {
     const response = await axios.post(
       `${BASE_URL}/fullPostDetails`,
-      {postId,userId},
+      { postId, userId },
       {
         headers: {
-          Authorization: `Bearer ${authToken}`, // Add the Bearer token in the Authorization header
+          Authorization: `Bearer ${authToken}`,
         },
       }
     );
-    
-    
-    return response.data; // Return the data part of the response
+
+    return response.data;
   } catch (error) {
-    console.error('Error fetching card details:', error);
-    throw error; // Re-throw the error for further handling
+    console.error('Error fetching post details:', error);
+    throw error;
   }
 };
-export const  addPost = async (formData) => {
+
+export const addPost = async (formData) => {
+  const authToken = getToken();
   
-    const authToken = getToken();
-    if (!authToken) {
-        return false;
-    }
-    
-    
+  if (!authToken) {
+    return false;
+  }
+
   try {
     const response = await axios.post(
       `${BASE_URL}/addPost`,
@@ -79,39 +73,39 @@ export const  addPost = async (formData) => {
       {
         headers: {
           "Content-Type": "multipart/form-data",
-          Authorization: `Bearer ${authToken}`, // Add the Bearer token in the Authorization header
+          Authorization: `Bearer ${authToken}`,
         },
       }
     );
-    
-    return response; // Return the data part of the response
+
+    return response;
   } catch (error) {
-    console.error('Error fetching card details:', error);
-    throw error; // Re-throw the error for further handling
+    console.error('Error adding post:', error);
+    throw error;
   }
 };
-export const  searchPost = async (formData) => {
+
+export const searchPost = async (formData) => {
+  const authToken = getToken();
   
-    const authToken = getToken();
-    if (!authToken) {
-        return false;
-    }
-    
-    
+  if (!authToken) {
+    return false;
+  }
+
   try {
     const response = await axios.post(
       `${BASE_URL}/search`,
       formData,
       {
         headers: {
-          Authorization: `Bearer ${authToken}`, // Add the Bearer token in the Authorization header
+          Authorization: `Bearer ${authToken}`,
         },
       }
     );
-    
-    return response; 
+
+    return response;
   } catch (error) {
-    console.error('Error fetching card details:', error);
-    throw error; // Re-throw the error for further handling
+    console.error('Error searching posts:', error);
+    throw error;
   }
 };
