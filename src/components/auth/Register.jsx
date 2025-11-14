@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
+import { setUser } from '../../redux/userSlice';
 import { createUsers } from '../../services/authService';
 
 export default function Register({ open, closeModal, openLoginModal }) {
@@ -9,6 +11,7 @@ export default function Register({ open, closeModal, openLoginModal }) {
   const [loading, setLoading] = useState(false);
 
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -22,8 +25,19 @@ export default function Register({ open, closeModal, openLoginModal }) {
       if (!response || !response.userId) {
         setError(response?.message || "Registration failed. Please try again.");
       } else {
+        // Store in localStorage
         localStorage.setItem("userId", response.userId);
         localStorage.setItem("username", response.username || "");
+        localStorage.setItem("email", response.email || "");
+        localStorage.setItem("profilePicture", response.profilePicture || "");
+
+        // Update Redux store
+        dispatch(setUser({
+          userId: response.userId,
+          username: response.username || "",
+          email: response.email || "",
+          profilePicture: response.profilePicture || ""
+        }));
 
         setUsername("");
         setPassword("");

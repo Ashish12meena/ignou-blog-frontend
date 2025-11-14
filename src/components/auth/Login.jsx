@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
+import { setUser } from '../../redux/userSlice';
 import { loginUser } from "../../services/authService";
 
 export default function Login({ open, closeModal }) {
@@ -9,6 +11,7 @@ export default function Login({ open, closeModal }) {
   const [formErrors, setFormErrors] = useState({ username: "", password: "" });
 
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -37,9 +40,19 @@ export default function Login({ open, closeModal }) {
       if (!response || !response.userId) {
         setError(response?.description || "Login failed. Please try again.");
       } else {
+        // Store in localStorage
         localStorage.setItem("userId", response.userId);
         localStorage.setItem("username", response.username || "");
         localStorage.setItem("profilePicture", response.profilePicture || "");
+        localStorage.setItem("email", response.email || "");
+
+        // Update Redux store
+        dispatch(setUser({
+          userId: response.userId,
+          username: response.username || "",
+          profilePicture: response.profilePicture || "",
+          email: response.email || ""
+        }));
 
         closeModal();
         navigate("/home");
