@@ -6,6 +6,7 @@ import PrivateRoute from './components/PrivateRoute';
 import Home from './pages/Home';
 import LandingPage from './pages/LandingPage';
 import Sidebar from './components/header/Sidebar';
+import AddPost from './components/post/AddPost';
 
 // Error Boundary Component
 class ErrorBoundary extends Component {
@@ -56,6 +57,8 @@ function App() {
           <div className="flex-1">
             <Routes>
               <Route path="/home" element={<PrivateRoute element={<Home />} />} />
+              <Route path="/write/post" element={<PrivateRoute element={<AddPost />} />} />
+              <Route path="/post" element={<PrivateRoute element={<FullPostCard />} />} />
               <Route path="/" element={<PrivateRoute element={<Home />} />} />
               <Route path="/start" element={<LandingPage />} />
               <Route path="/start" element={<LandingPage />} />
