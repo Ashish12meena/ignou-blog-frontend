@@ -1,8 +1,11 @@
 import axios from 'axios';
-import { getCurrentUser } from './authService';
+import { getCurrentUser, getAuthHeader } from './authService';
 
 const BASE = import.meta.env.VITE_API_URL || 'http://localhost:8080';
 const BASE_URL = `${BASE}/api/posts`;
+
+// Configure axios
+axios.defaults.withCredentials = true;
 
 // Logger utility
 const logger = {
@@ -11,19 +14,26 @@ const logger = {
   success: (message, data) => console.log(`[POST SUCCESS] ${message}`, data || '')
 };
 
-const getToken = () => {
-  const user = getCurrentUser();
-  return user ? user.userId : null;
+// Get auth headers
+const getHeaders = (isMultipart = false) => {
+  const authHeader = getAuthHeader();
+  const headers = {
+    'Authorization': authHeader
+  };
+  
+  if (!isMultipart) {
+    headers['Content-Type'] = 'application/json';
+  }
+  
+  return headers;
 };
 
 export const getCardDetails = async ({ userId, excludedIds = [] }) => {
   logger.info('Fetching card details', { userId, excludedCount: excludedIds.length });
   
-  const authToken = getToken();
-
-  if (!authToken) {
-    logger.error('No auth token found');
-    return false;
+  if (!userId) {
+    logger.error('No userId provided');
+    throw new Error('User ID is required');
   }
 
   try {
@@ -31,9 +41,8 @@ export const getCardDetails = async ({ userId, excludedIds = [] }) => {
       `${BASE_URL}/cardDetails`,
       { userId, excludedIds },
       {
-        headers: {
-          Authorization: `Bearer ${authToken}`,
-        },
+        headers: getHeaders(),
+        withCredentials: true
       }
     );
 
@@ -48,11 +57,9 @@ export const getCardDetails = async ({ userId, excludedIds = [] }) => {
 export const getFullPostDetail = async ({ postId, userId }) => {
   logger.info('Fetching full post details', { postId, userId });
   
-  const authToken = getToken();
-  
-  if (!authToken) {
-    logger.error('No auth token found');
-    return false;
+  if (!userId || !postId) {
+    logger.error('Missing required parameters');
+    throw new Error('Post ID and User ID are required');
   }
 
   try {
@@ -60,9 +67,8 @@ export const getFullPostDetail = async ({ postId, userId }) => {
       `${BASE_URL}/fullPostDetails`,
       { postId, userId },
       {
-        headers: {
-          Authorization: `Bearer ${authToken}`,
-        },
+        headers: getHeaders(),
+        withCredentials: true
       }
     );
 
@@ -77,29 +83,46 @@ export const getFullPostDetail = async ({ postId, userId }) => {
 export const addPost = async (formData) => {
   logger.info('Adding new post');
   
-  const authToken = getToken();
-  
-  if (!authToken) {
-    logger.error('No auth token found');
-    return false;
+  // Verify userId is in formData
+  const userId = formData.get('userId');
+  if (!userId) {
+    logger.error('No userId in formData');
+    throw new Error('User ID is required to create a post');
   }
+  
+  logger.info('Post data', { 
+    userId, 
+    title: formData.get('title'),
+    hasImage: !!formData.get('postImage')
+  });
 
   try {
+    const authHeader = getAuthHeader();
+    
     const response = await axios.post(
       `${BASE_URL}/addPost`,
       formData,
       {
         headers: {
-          "Content-Type": "multipart/form-data",
-          Authorization: `Bearer ${authToken}`,
+          'Authorization': authHeader,
+          // Don't set Content-Type for multipart/form-data
+          // Let browser set it with boundary
         },
+        withCredentials: true
       }
     );
 
-    logger.success('Post added successfully', { postId: response.data?.postId });
+    logger.success('Post added successfully', { 
+      status: response.status,
+      data: response.data 
+    });
     return response;
   } catch (error) {
-    logger.error('Failed to add post', error.response?.data || error.message);
+    logger.error('Failed to add post', {
+      status: error.response?.status,
+      data: error.response?.data,
+      message: error.message
+    });
     throw error;
   }
 };
@@ -107,21 +130,13 @@ export const addPost = async (formData) => {
 export const searchPost = async (formData) => {
   logger.info('Searching posts', formData);
   
-  const authToken = getToken();
-  
-  if (!authToken) {
-    logger.error('No auth token found');
-    return false;
-  }
-
   try {
     const response = await axios.post(
       `${BASE_URL}/search`,
       formData,
       {
-        headers: {
-          Authorization: `Bearer ${authToken}`,
-        },
+        headers: getHeaders(),
+        withCredentials: true
       }
     );
 

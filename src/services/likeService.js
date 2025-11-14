@@ -1,8 +1,10 @@
 import axios from "axios";
-import { getCurrentUser } from "./authService";
+import { getAuthHeader } from "./authService";
 
 const BASE = import.meta.env.VITE_API_URL || 'http://localhost:8080';
 const REST_API_BASE_URL = `${BASE}/api/like`;
+
+axios.defaults.withCredentials = true;
 
 // Logger utility
 const logger = {
@@ -11,19 +13,17 @@ const logger = {
   success: (message, data) => console.log(`[LIKE SUCCESS] ${message}`, data || '')
 };
 
-const getToken = () => {
-  const user = getCurrentUser();
-  return user ? user.userId : null;
-};
+const getHeaders = () => ({
+  'Authorization': getAuthHeader(),
+  'Content-Type': 'application/json'
+});
 
 export const checkIfLiked = async (userId, postId) => {
   logger.info('Checking like status', { userId, postId });
   
-  const authToken = getToken();
-
-  if (!authToken) {
-    logger.error('No auth token found');
-    return false;
+  if (!userId || !postId) {
+    logger.error('Missing parameters');
+    throw new Error('User ID and Post ID are required');
   }
 
   try {
@@ -31,18 +31,13 @@ export const checkIfLiked = async (userId, postId) => {
       `${REST_API_BASE_URL}/likeStatus`,
       { userId, postId },
       {
-        headers: {
-          Authorization: `Bearer ${authToken}`,
-        },
+        headers: getHeaders(),
+        withCredentials: true
       }
     );
 
-    if (response.status === 200) {
-      logger.success('Like status checked', { liked: response.data });
-      return response;
-    } else {
-      throw new Error('Failed to check like status');
-    }
+    logger.success('Like status checked', { liked: response.data });
+    return response;
   } catch (error) {
     logger.error('Failed to check like status', error.response?.data || error.message);
     throw error;
@@ -52,11 +47,9 @@ export const checkIfLiked = async (userId, postId) => {
 export const addLike = async (userId, postId) => {
   logger.info('Adding like', { userId, postId });
   
-  const authToken = getToken();
-
-  if (!authToken) {
-    logger.error('No auth token found');
-    return false;
+  if (!userId || !postId) {
+    logger.error('Missing parameters');
+    throw new Error('User ID and Post ID are required');
   }
 
   try {
@@ -64,18 +57,13 @@ export const addLike = async (userId, postId) => {
       `${REST_API_BASE_URL}/addlike`,
       { userId, postId },
       {
-        headers: {
-          Authorization: `Bearer ${authToken}`,
-        },
+        headers: getHeaders(),
+        withCredentials: true
       }
     );
 
-    if (response.status === 200) {
-      logger.success('Like added successfully', { postId });
-      return response;
-    } else {
-      throw new Error('Failed to add like');
-    }
+    logger.success('Like added successfully', { postId });
+    return response;
   } catch (error) {
     logger.error('Failed to add like', error.response?.data || error.message);
     throw error;
@@ -85,11 +73,9 @@ export const addLike = async (userId, postId) => {
 export const removeLike = async (userId, postId) => {
   logger.info('Removing like', { userId, postId });
   
-  const authToken = getToken();
-
-  if (!authToken) {
-    logger.error('No auth token found');
-    return false;
+  if (!userId || !postId) {
+    logger.error('Missing parameters');
+    throw new Error('User ID and Post ID are required');
   }
 
   try {
@@ -97,18 +83,13 @@ export const removeLike = async (userId, postId) => {
       `${REST_API_BASE_URL}/removelike`,
       { userId, postId },
       {
-        headers: {
-          Authorization: `Bearer ${authToken}`,
-        },
+        headers: getHeaders(),
+        withCredentials: true
       }
     );
 
-    if (response.status === 200) {
-      logger.success('Like removed successfully', { postId });
-      return response;
-    } else {
-      throw new Error('Failed to remove like');
-    }
+    logger.success('Like removed successfully', { postId });
+    return response;
   } catch (error) {
     logger.error('Failed to remove like', error.response?.data || error.message);
     throw error;
@@ -118,11 +99,9 @@ export const removeLike = async (userId, postId) => {
 export const LikeCommentCount = async (postId) => {
   logger.info('Fetching like/comment count', { postId });
   
-  const authToken = getToken();
-
-  if (!authToken) {
-    logger.error('No auth token found');
-    return false;
+  if (!postId) {
+    logger.error('Missing postId');
+    throw new Error('Post ID is required');
   }
 
   try {
@@ -130,18 +109,13 @@ export const LikeCommentCount = async (postId) => {
       `${REST_API_BASE_URL}/getCount`,
       { postId },
       {
-        headers: {
-          Authorization: `Bearer ${authToken}`,
-        },
+        headers: getHeaders(),
+        withCredentials: true
       }
     );
 
-    if (response.status === 200) {
-      logger.success('Count fetched successfully', response.data);
-      return response;
-    } else {
-      throw new Error('Failed to get count');
-    }
+    logger.success('Count fetched successfully', response.data);
+    return response;
   } catch (error) {
     logger.error('Failed to get like/comment count', error.response?.data || error.message);
     throw error;

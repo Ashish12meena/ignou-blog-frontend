@@ -1,8 +1,10 @@
 import axios from 'axios';
-import { getCurrentUser } from './authService';
+import { getAuthHeader } from './authService';
 
 const BASE = import.meta.env.VITE_API_URL || 'http://localhost:8080';
 const BASE_URL = `${BASE}/api/category`;
+
+axios.defaults.withCredentials = true;
 
 // Logger utility
 const logger = {
@@ -11,29 +13,21 @@ const logger = {
   success: (message, data) => console.log(`[CATEGORY SUCCESS] ${message}`, data || '')
 };
 
-const getToken = () => {
-  const user = getCurrentUser();
-  return user ? user : null;
-};
+const getHeaders = () => ({
+  'Authorization': getAuthHeader(),
+  'Content-Type': 'application/json'
+});
 
 export const getCategories = async () => {
   logger.info('Fetching categories');
-  
-  const authToken = getToken();
-
-  if (!authToken) {
-    logger.error('No auth token found');
-    return false;
-  }
 
   try {
     const response = await axios.post(
       `${BASE_URL}/list`,
       {},
       {
-        headers: {
-          Authorization: `Bearer ${authToken}`,
-        },
+        headers: getHeaders(),
+        withCredentials: true
       }
     );
 

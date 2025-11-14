@@ -1,8 +1,10 @@
 import axios from "axios";
-import { getCurrentUser } from "./authService";
+import { getAuthHeader } from "./authService";
 
 const BASE = import.meta.env.VITE_API_URL || 'http://localhost:8080';
 const REST_API_BASE_URL = `${BASE}/api/users`;
+
+axios.defaults.withCredentials = true;
 
 // Logger utility
 const logger = {
@@ -11,19 +13,17 @@ const logger = {
   success: (message, data) => console.log(`[USER SUCCESS] ${message}`, data || '')
 };
 
-const getToken = () => {
-  const user = getCurrentUser();
-  return user ? user : null;
-};
+const getHeaders = () => ({
+  'Authorization': getAuthHeader(),
+  'Content-Type': 'application/json'
+});
 
 export const getUserByEmail = async (email, userId) => {
   logger.info('Fetching user by email', { email, userId });
   
-  const authToken = getToken();
-
-  if (!authToken) {
-    logger.error('No auth token found');
-    return false;
+  if (!email || !userId) {
+    logger.error('Missing parameters');
+    throw new Error('Email and User ID are required');
   }
 
   try {
@@ -31,9 +31,8 @@ export const getUserByEmail = async (email, userId) => {
       `${REST_API_BASE_URL}/userdetails`,
       { email, userId },
       {
-        headers: {
-          Authorization: `Bearer ${authToken}`,
-        },
+        headers: getHeaders(),
+        withCredentials: true
       }
     );
 

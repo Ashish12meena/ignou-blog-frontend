@@ -1,7 +1,9 @@
 import axios from "axios";
-import { getCurrentUser } from './authService';
+import { getAuthHeader } from './authService';
 
 const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080';
+
+axios.defaults.withCredentials = true;
 
 // Logger utility
 const logger = {
@@ -10,19 +12,17 @@ const logger = {
   success: (message, data) => console.log(`[FOLLOW SUCCESS] ${message}`, data || '')
 };
 
-const getToken = () => {
-  const user = getCurrentUser();
-  return user ? user : null;
-};
+const getHeaders = () => ({
+  'Authorization': getAuthHeader(),
+  'Content-Type': 'application/json'
+});
 
 export const addFollower = async (loggedUserId, followedUserId) => {
   logger.info('Adding follower', { loggedUserId, followedUserId });
   
-  const authToken = getToken();
-
-  if (!authToken) {
-    logger.error('No auth token found');
-    return false;
+  if (!loggedUserId || !followedUserId) {
+    logger.error('Missing parameters');
+    throw new Error('Both user IDs are required');
   }
 
   try {
@@ -30,10 +30,8 @@ export const addFollower = async (loggedUserId, followedUserId) => {
       `${BASE_URL}/api/follow/add`,
       { loggedUserId, followedUserId },
       {
-        headers: {
-          Authorization: `Bearer ${authToken}`,
-          "Content-Type": "application/json",
-        },
+        headers: getHeaders(),
+        withCredentials: true
       }
     );
 
@@ -48,11 +46,9 @@ export const addFollower = async (loggedUserId, followedUserId) => {
 export const removeFollower = async (loggedUserId, followedUserId) => {
   logger.info('Removing follower', { loggedUserId, followedUserId });
   
-  const authToken = getToken();
-
-  if (!authToken) {
-    logger.error('No auth token found');
-    return false;
+  if (!loggedUserId || !followedUserId) {
+    logger.error('Missing parameters');
+    throw new Error('Both user IDs are required');
   }
 
   try {
@@ -60,10 +56,8 @@ export const removeFollower = async (loggedUserId, followedUserId) => {
       `${BASE_URL}/api/follow/remove`,
       { loggedUserId, followedUserId },
       {
-        headers: {
-          Authorization: `Bearer ${authToken}`,
-          "Content-Type": "application/json",
-        },
+        headers: getHeaders(),
+        withCredentials: true
       }
     );
 
@@ -78,11 +72,9 @@ export const removeFollower = async (loggedUserId, followedUserId) => {
 export const getFollowStatus = async (loggedUserId, followedUserId) => {
   logger.info('Checking follow status', { loggedUserId, followedUserId });
   
-  const authToken = getToken();
-
-  if (!authToken) {
-    logger.error('No auth token found');
-    return false;
+  if (!loggedUserId || !followedUserId) {
+    logger.error('Missing parameters');
+    throw new Error('Both user IDs are required');
   }
 
   try {
@@ -90,10 +82,8 @@ export const getFollowStatus = async (loggedUserId, followedUserId) => {
       `${BASE_URL}/api/follow/status`,
       { loggedUserId, followedUserId },
       {
-        headers: {
-          Authorization: `Bearer ${authToken}`,
-          "Content-Type": "application/json",
-        },
+        headers: getHeaders(),
+        withCredentials: true
       }
     );
 

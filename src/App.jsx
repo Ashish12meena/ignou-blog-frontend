@@ -9,6 +9,7 @@ import Sidebar from './components/header/Sidebar';
 import AddPost from './components/post/AddPost';
 import FullPostCard from './components/post/FullPostCard';
 import Explore from './pages/Explore';
+import Profile from './pages/UserProfile';
 
 // Error Boundary Component
 class ErrorBoundary extends Component {
@@ -62,6 +63,11 @@ function App() {
               <Route path="/write/post" element={<PrivateRoute element={<AddPost />} />} />
               <Route path="/post" element={<PrivateRoute element={<FullPostCard />} />} />
               <Route path="/explore" element={<PrivateRoute element={<Explore />} />} />
+              
+              {/* Profile Routes */}
+              <Route path="/profile" element={<PrivateRoute element={<Profile />} />} />
+              <Route path="/profile/:userEmail" element={<PrivateRoute element={<Profile />} />} />
+              
               <Route path="/" element={<PrivateRoute element={<Home />} />} />
               <Route path="/start" element={<LandingPage />} />
               
