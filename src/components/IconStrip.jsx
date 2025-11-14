@@ -1,15 +1,21 @@
 import React, { useState } from 'react';
+import PropTypes from 'prop-types';
 import { FaRegHeart, FaCommentDots, FaRegBookmark, FaEllipsisH, FaHeart, FaBookmark } from 'react-icons/fa';
 import { addLike, removeLike } from '../services/likeService';
 
-const IconStrip = ({ likeCount, commentCount, saves, postId, likeStatus }) => {
-  const [liked, setLiked] = useState(likeStatus || false);
-  const [likeCounts, setLikeCounts] = useState(likeCount || 0);
+const IconStrip = ({ likeCount = 0, commentCount = 0, saves = 0, postId, likeStatus = false }) => {
+  const [liked, setLiked] = useState(likeStatus);
+  const [likeCounts, setLikeCounts] = useState(likeCount);
   const [bookMark, setBookMark] = useState(false);
 
   const handleLike = async () => {
     const userId = localStorage.getItem('userId');
     
+    if (!userId) {
+      console.error('User not logged in');
+      return;
+    }
+
     try {
       if (liked) {
         setLiked(false);
@@ -22,6 +28,7 @@ const IconStrip = ({ likeCount, commentCount, saves, postId, likeStatus }) => {
       }
     } catch (error) {
       console.error('Error handling like:', error);
+      // Revert changes on error
       setLiked(!liked);
       setLikeCounts(liked ? likeCounts + 1 : likeCounts - 1);
     }
@@ -60,6 +67,14 @@ const IconStrip = ({ likeCount, commentCount, saves, postId, likeStatus }) => {
       </div>
     </div>
   );
+};
+
+IconStrip.propTypes = {
+  likeCount: PropTypes.number,
+  commentCount: PropTypes.number,
+  saves: PropTypes.number,
+  postId: PropTypes.string.isRequired,
+  likeStatus: PropTypes.bool,
 };
 
 export default IconStrip;
